@@ -1,7 +1,7 @@
 {
   "name": "six-d",
   "description": "A structured six-stage engineering workflow: Discover → Design → Demonstrate → Develop → Document → Debrief",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "jkerdels"
   },
