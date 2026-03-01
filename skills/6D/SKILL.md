@@ -151,7 +151,7 @@ When the user invokes `/six-d:6D back <stage>`:
 
 ### Status Report
 
-When `/6D:6D status` is invoked:
+When `/six-d:6D status` is invoked:
 
 ```
 6D: <project-name> (<type>)
