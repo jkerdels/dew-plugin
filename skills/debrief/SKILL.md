@@ -1,5 +1,5 @@
 ---
-name: 6D-debrief
+name: debrief
 description: Development cycle retrospective for the 6D workflow. Facilitates a structured post-mortem of a completed 6D cycle, extracts actionable insights, and institutionalizes those insights into the skill configurations. Use after a complete Discover → Design → Demonstrate → Develop → Document cycle.
 ---
 
@@ -71,7 +71,7 @@ For each skill involved in the cycle, synthesize your findings:
 
 ### Phase 5: Writing Lessons Learned
 
-For each skill with findings, add a `## Lessons Learned` section to its skill `.md` file in `/home/jk/.claude/skills/`. Format this section as:
+For each skill with findings, add a `## Lessons Learned` section to its `SKILL.md` file in this plugin's `skills/` directory (ask the user for the plugin's installed path if not known from context). Format this section as:
 
 ```markdown
 ## Lessons Learned
@@ -99,14 +99,14 @@ If analysis identifies **major shortcomings** — a fundamental flaw requiring s
 1. **Discuss the proposed changes with the user first**: Explain what needs to change and why. Get alignment before creating new files.
 
 2. **Rename the current file to include a version number**:
-   - `6D-design/SKILL.md` → `6D-design/SKILL.v1.md`
+   - `skills/design/SKILL.md` → `skills/design/SKILL.v1.md`
 
 3. **Create the new version**:
-   - `6D-design/SKILL.v2.md` — containing the revised skill configuration
+   - `skills/design/SKILL.v2.md` — containing the revised skill configuration
    - Document at the top: what changed from v1 and why
    - Preserve all original content in `.v1.md` — do not modify it
 
-4. **Document the A/B test intent**: In the new `.v2.md` file, add a section explaining:
+4. **Document the A/B test intent**: In the new `SKILL.v2.md` file, add a section explaining:
    - What hypothesis the new version is testing
    - How to evaluate whether v2 outperforms v1
    - Which specific scenarios will reveal the difference
@@ -143,7 +143,7 @@ Create a summary file at `docs/6D/06-debrief.md` containing:
 [Things that remain unresolved or need more data from future cycles]
 ```
 
-When the summary is complete, the user will invoke `/6D done` to finalize the cycle.
+When the summary is complete, the user will invoke `/6D:proc done` to finalize the cycle.
 
 ---
 

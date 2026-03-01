@@ -1,5 +1,5 @@
 ---
-name: 6D-discover
+name: discover
 description: Deep problem domain exploration for the 6D workflow. Guides a structured conversation to develop shared understanding of a problem before any implementation discussion begins. Use at the start of a new project or feature, or when returning to re-examine requirements after a later stage revealed a gap.
 ---
 
@@ -96,7 +96,7 @@ The report must be produced in **Markdown** and must include:
 
 The report should be thorough enough that a development team reading it could understand exactly what they are building, why, and how they will know if they've succeeded — without any ambiguity.
 
-When the report is complete, the user will invoke `/6D done` to trigger artifact saving and stage transition.
+When the report is complete, the user will invoke `/6D:proc done` to trigger artifact saving and stage transition.
 
 ---
 

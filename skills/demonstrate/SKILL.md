@@ -1,5 +1,5 @@
 ---
-name: 6D-demonstrate
+name: demonstrate
 description: Empirical design validation for the 6D workflow. Identifies the critical assumptions in an Implementation Design Document, writes isolated test programs to verify them, and produces a Design Verification Document. Use when a Design artifact is in hand and needs rigorous empirical validation before production code is written.
 ---
 
@@ -115,7 +115,7 @@ Produce `design-verification/DESIGN_VERIFICATION.md` containing:
 [Concrete, actionable recommendations: proceed / revise / reject for each design element]
 ```
 
-When the document is complete, the user will invoke `/6D done` to trigger artifact saving and stage transition.
+When the document is complete, the user will invoke `/6D:proc done` to trigger artifact saving and stage transition.
 
 ---
 

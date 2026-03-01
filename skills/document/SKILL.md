@@ -1,5 +1,5 @@
 ---
-name: 6D-document
+name: document
 description: Technical documentation writing for the 6D workflow. Synthesizes all planning, design, validation, and implementation artifacts into a comprehensive developer-facing documentation site. Use when the Develop stage is complete and the project needs documentation for external developers or future contributors.
 ---
 
@@ -153,4 +153,4 @@ Before finalizing documentation output, verify:
 - If you cannot produce a section without speculating beyond what the artifacts support, leave a clearly marked placeholder with an explanation of what is needed
 - Never present inferences as facts
 
-When documentation is complete and reviewed with the user, they will invoke `/6D done` to trigger stage transition.
+When documentation is complete and reviewed with the user, they will invoke `/6D:proc done` to trigger stage transition.

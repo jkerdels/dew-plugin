@@ -1,5 +1,5 @@
 ---
-name: 6D
+name: proc
 description: 6D workflow orchestrator. Manages the six-stage development process (Discover → Design → Demonstrate → Develop → Document → Debrief), tracking state, loading artifact context, invoking stage skills, and maintaining git history at stage boundaries.
 ---
 
@@ -9,20 +9,20 @@ description: 6D workflow orchestrator. Manages the six-stage development process
 
 | Stage | Skill | Artifact |
 |-------|-------|----------|
-| **Discover** | `/6D-discover` | `docs/6D/01-discover.md` |
-| **Design** | `/6D-design` | `docs/6D/02-design.md` |
-| **Demonstrate** | `/6D-demonstrate` | `design-verification/DESIGN_VERIFICATION.md` |
-| **Develop** | `/6D-develop` | production code in repo |
-| **Document** | `/6D-document` | `docs/` Hugo site |
-| **Debrief** | `/6D-debrief` | `docs/6D/06-debrief.md` |
+| **Discover** | `/6D:discover` | `docs/6D/01-discover.md` |
+| **Design** | `/6D:design` | `docs/6D/02-design.md` |
+| **Demonstrate** | `/6D:demonstrate` | `design-verification/DESIGN_VERIFICATION.md` |
+| **Develop** | `/6D:develop` | production code in repo |
+| **Document** | `/6D:document` | `docs/` Hugo site |
+| **Debrief** | `/6D:debrief` | `docs/6D/06-debrief.md` |
 
 **Commands:**
-- `/6D` — continue from the current active stage
-- `/6D new` — start a new 6D project
-- `/6D done` — complete the current stage: write artifact, update state, commit, then prompt for `/clear`
-- `/6D status` — show current state without entering a stage
-- `/6D back <stage>` — backtrack to an earlier stage
-- `/6D <stage-name>` — jump to a named stage (discover / design / demonstrate / develop / document / debrief)
+- `/6D:proc` — continue from the current active stage
+- `/6D:proc new` — start a new 6D project
+- `/6D:proc done` — complete the current stage: write artifact, update state, commit, then prompt for `/clear`
+- `/6D:proc status` — show current state without entering a stage
+- `/6D:proc back <stage>` — backtrack to an earlier stage
+- `/6D:<stage-name>` — jump to a named stage (discover / design / demonstrate / develop / document / debrief)
 
 ---
 
@@ -89,20 +89,20 @@ Read the `Active Stage` from the save state. Load context for the stage (read an
 - That you are now invoking the stage skill
 
 Then invoke the stage skill via the Skill tool:
-- discover → `Skill("6D-discover")`
-- design → `Skill("6D-design")`
-- demonstrate → `Skill("6D-demonstrate")`
-- develop → `Skill("6D-develop")`
-- document → `Skill("6D-document")`
-- debrief → `Skill("6D-debrief")`
+- discover → `Skill("6D:discover")`
+- design → `Skill("6D:design")`
+- demonstrate → `Skill("6D:demonstrate")`
+- develop → `Skill("6D:develop")`
+- document → `Skill("6D:document")`
+- debrief → `Skill("6D:debrief")`
 
 **If this is a revisit** (backtrack log is non-empty for this stage), prepend a brief summary of why we are back here before invoking the skill, so the stage skill has the backtrack context.
 
 ---
 
-### Step 4 — Complete Stage (triggered by `/6D done`)
+### Step 4 — Complete Stage (triggered by `/6D:proc done`)
 
-When the user invokes `/6D done`:
+When the user invokes `/6D:proc done`:
 
 1. **Write the stage artifact** by synthesizing the conversation:
    - discover → write `docs/6D/01-discover.md`
@@ -127,13 +127,13 @@ When the user invokes `/6D done`:
    - What artifact was written
    - What stage is next and what it will focus on
    - Flag anything from the conversation that might warrant backtracking before proceeding
-   - Then say: **"Run `/clear` and then `/6D` to begin the next stage with a clean context."**
+   - Then say: **"Run `/clear` and then `/6D:proc` to begin the next stage with a clean context."**
 
 ---
 
 ### Backtrack Protocol
 
-When the user invokes `/6D back <stage>`:
+When the user invokes `/6D:proc back <stage>`:
 
 1. Ask for the reason if not provided: "What did you find that requires going back to [stage]?"
 
@@ -151,7 +151,7 @@ When the user invokes `/6D back <stage>`:
 
 ### Status Report
 
-When `/6D status` is invoked:
+When `/6D:proc status` is invoked:
 
 ```
 6D: <project-name> (<type>)
