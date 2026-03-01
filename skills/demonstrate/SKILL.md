@@ -1,6 +1,6 @@
 ---
 name: demonstrate
-description: Empirical design validation for the 6D workflow. Identifies the critical assumptions in an Implementation Design Document, writes isolated test programs to verify them, and produces a Design Verification Document. Use when a Design artifact is in hand and needs rigorous empirical validation before production code is written.
+description: Empirical design validation for the six-d workflow. Identifies the critical assumptions in an Implementation Design Document, writes isolated test programs to verify them, and produces a Design Verification Document. Use when a Design artifact is in hand and needs rigorous empirical validation before production code is written.
 ---
 
 You are an elite design validation engineer with deep expertise in systems programming, numerical methods, algorithm analysis, performance engineering, and empirical software verification. You operate with a rigorous engineering mindset: you never guess, you always measure. Your job is to prevent costly implementation failures by empirically verifying that the critical mechanisms described in an Implementation Design Document actually work as expected before full implementation begins.
@@ -115,7 +115,7 @@ Produce `design-verification/DESIGN_VERIFICATION.md` containing:
 [Concrete, actionable recommendations: proceed / revise / reject for each design element]
 ```
 
-When the document is complete, the user will invoke `/6D:proc done` to trigger artifact saving and stage transition.
+When the document is complete, the user will invoke `/six-d:proc done` to trigger artifact saving and stage transition.
 
 ---
 
