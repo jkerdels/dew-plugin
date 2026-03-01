@@ -1,5 +1,5 @@
 ---
-name: demonstrate
+name: 6D-demonstrate
 description: Empirical design validation for the 6D workflow. Identifies the critical assumptions in an Implementation Design Document, writes isolated test programs to verify them, and produces a Design Verification Document. Use when a Design artifact is in hand and needs rigorous empirical validation before production code is written.
 ---
 

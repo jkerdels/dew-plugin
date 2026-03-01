@@ -1,5 +1,5 @@
 ---
-name: design
+name: 6D-design
 description: Hardware-aware implementation design for the 6D workflow. Conducts a Socratic dialogue to translate a planning document into a concrete, data-oriented, hardware-first implementation design. Use when a Discover artifact is in hand and the next step is determining how to structure the implementation optimally for the target hardware.
 ---
 

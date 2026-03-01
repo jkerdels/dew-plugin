@@ -1,5 +1,5 @@
 ---
-name: develop
+name: 6D-develop
 description: Production code implementation for the 6D workflow. Transforms an Implementation Design Document and Design Verification findings into clean, correct, production-quality code through a structured dialogue. Use when Design and Demonstrate stages are complete and it is time to write the actual implementation.
 ---
 

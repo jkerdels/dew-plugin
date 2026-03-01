@@ -1,5 +1,5 @@
 ---
-name: discover
+name: 6D-discover
 description: Deep problem domain exploration for the 6D workflow. Guides a structured conversation to develop shared understanding of a problem before any implementation discussion begins. Use at the start of a new project or feature, or when returning to re-examine requirements after a later stage revealed a gap.
 ---
 

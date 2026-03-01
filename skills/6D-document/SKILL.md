@@ -1,5 +1,5 @@
 ---
-name: document
+name: 6D-document
 description: Technical documentation writing for the 6D workflow. Synthesizes all planning, design, validation, and implementation artifacts into a comprehensive developer-facing documentation site. Use when the Develop stage is complete and the project needs documentation for external developers or future contributors.
 ---
 

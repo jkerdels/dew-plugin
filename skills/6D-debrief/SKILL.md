@@ -1,5 +1,5 @@
 ---
-name: debrief
+name: 6D-debrief
 description: Development cycle retrospective for the 6D workflow. Facilitates a structured post-mortem of a completed 6D cycle, extracts actionable insights, and institutionalizes those insights into the skill configurations. Use after a complete Discover → Design → Demonstrate → Develop → Document cycle.
 ---
 
