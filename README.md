@@ -1,6 +1,6 @@
-# six-d — A Structured Engineering Workflow for Claude Code
+# 6D — A Structured Engineering Workflow for Claude Code
 
-**six-d** is a Claude Code plugin implementing a rigorous, six-stage software development process. Each stage is an interactive conversation with a specialized AI assistant, producing a concrete artifact that feeds the next stage. The workflow enforces engineering discipline: explicit assumptions, measurable goals, empirical validation before implementation, and structured retrospectives.
+**6D** is a Claude Code plugin implementing a rigorous, six-stage software development process. Each stage is an interactive conversation with a specialized AI assistant, producing a concrete artifact that feeds the next stage. The workflow enforces engineering discipline: explicit assumptions, measurable goals, empirical validation before implementation, and structured retrospectives.
 
 ```
 Discover → Design → Demonstrate → Develop → Document → Debrief
@@ -12,12 +12,12 @@ Discover → Design → Demonstrate → Develop → Document → Debrief
 
 | # | Stage | What Happens | Artifact |
 |---|-------|-------------|----------|
-| 1 | **Discover** | Deep problem domain exploration. Surfaces assumptions, defines measurable success criteria, maps constraints and stakeholders. No implementation talk. | `docs/six-d/01-discover.md` |
-| 2 | **Design** | Hardware-aware implementation design. Data layouts, compute kernels, module structure — driven by the hardware's capabilities, not the problem's semantics. | `docs/six-d/02-design.md` |
+| 1 | **Discover** | Deep problem domain exploration. Surfaces assumptions, defines measurable success criteria, maps constraints and stakeholders. No implementation talk. | `docs/6D/01-discover.md` |
+| 2 | **Design** | Hardware-aware implementation design. Data layouts, compute kernels, module structure — driven by the hardware's capabilities, not the problem's semantics. | `docs/6D/02-design.md` |
 | 3 | **Demonstrate** | Empirical validation of critical design assumptions. Minimal isolated test programs, measured against theoretical hardware limits. Failures caught here, not in production. | `design-verification/DESIGN_VERIFICATION.md` |
 | 4 | **Develop** | Production code implementation. Structure defined and agreed before a single line is written. Incremental validation throughout. | (codebase) |
 | 5 | **Document** | Developer-facing Hugo documentation site. Synthesizes all upstream artifacts into architecture docs, design decisions, internals, and codebase map. | `docs/` Hugo site |
-| 6 | **Debrief** | Structured retrospective. Root-cause analysis of what worked and what didn't, with findings written back into the skill configurations for the next cycle. | `docs/six-d/06-debrief.md` |
+| 6 | **Debrief** | Structured retrospective. Root-cause analysis of what worked and what didn't, with findings written back into the skill configurations for the next cycle. | `docs/6D/06-debrief.md` |
 
 ---
 
@@ -30,26 +30,26 @@ Discover → Design → Demonstrate → Develop → Document → Debrief
 ### Install from GitHub
 
 ```
-/plugin marketplace add jkerdels/six-d-plugin
-/plugin install six-d@jkerdels
+/plugin marketplace add jkerdels/6D-plugin
+/plugin install 6D@jkerdels
 ```
 
 ### Test locally (without installing)
 
 ```bash
-claude --plugin-dir ./path/to/six-d-plugin
+claude --plugin-dir ./path/to/6D-plugin
 ```
 
 ---
 
 ## Usage
 
-All commands are prefixed with `/six-d:`.
+All commands can be prefixed with the namespace `/6D:`, but the search in claude code omits this.
 
 ### Start a new project
 
 ```
-/six-d:proc new
+/6D new
 ```
 
 The orchestrator asks for a project name and type, creates the state file, and drops you into the **Discover** stage.
@@ -57,19 +57,19 @@ The orchestrator asks for a project name and type, creates the state file, and d
 ### Continue from where you left off
 
 ```
-/six-d:proc
+/6D
 ```
 
 ### Check current status
 
 ```
-/six-d:proc status
+/6D status
 ```
 
 ### Complete the current stage and advance
 
 ```
-/six-d:proc done
+/6D done
 ```
 
 Writes the stage artifact, commits it to git, and prompts you to `/clear` before the next stage (each stage runs with a clean context window).
@@ -77,18 +77,18 @@ Writes the stage artifact, commits it to git, and prompts you to `/clear` before
 ### Jump directly to a stage
 
 ```
-/six-d:discover
-/six-d:design
-/six-d:demonstrate
-/six-d:develop
-/six-d:document
-/six-d:debrief
+/6D-discover
+/6D-design
+/6D-demonstrate
+/6D-develop
+/6D-document
+/6D-debrief
 ```
 
 ### Backtrack to an earlier stage
 
 ```
-/six-d:proc back design
+/6D back design
 ```
 
 Records the reason in the state file and reloads that stage's context.
@@ -131,7 +131,7 @@ README.md
 
 ## State File
 
-The workflow maintains `.claude/six-d-state.md` in your project repository, tracking:
+The workflow maintains `.claude/6D-state.md` in your project repository, tracking:
 - Current active stage and status
 - Artifact completion status
 - Stage log with visit counts and dates

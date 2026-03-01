@@ -1,11 +1,11 @@
 {
-  "name": "six-d",
+  "name": "6D",
   "description": "A structured six-stage engineering workflow: Discover → Design → Demonstrate → Develop → Document → Debrief",
   "version": "1.0.0",
   "author": {
     "name": "jkerdels"
   },
-  "homepage": "https://github.com/jkerdels/six-d-plugin",
-  "repository": "https://github.com/jkerdels/six-d-plugin",
+  "homepage": "https://github.com/jkerdels/6D-plugin",
+  "repository": "https://github.com/jkerdels/6D-plugin",
   "license": "MIT"
 }
