@@ -9,7 +9,7 @@ description: 6D workflow orchestrator. Manages the six-stage development process
 
 | Stage | Plugin | Skill | Artifact |
 |-------|--------|-------|----------|
-| **Discover** | six-d | `/6D-discover` | `docs/6D/01-discover.md` |
+| **Discover** | six-d | `/6D-discover` | `docs/6D/01-discover.md` | 
 | **Design** | six-d | `/6D-design` | `docs/6D/02-design.md` |
 | **Demonstrate** | six-d | `/6D-demonstrate` | `design-verification/DESIGN_VERIFICATION.md` |
 | **Develop** | six-d | `/6D-develop` | production code in repo |
@@ -24,7 +24,7 @@ description: 6D workflow orchestrator. Manages the six-stage development process
 - `/6D back <stage>` — backtrack to an earlier stage
 - `/6D-<stage-name>` — jump to a named stage (6D-discover / 6D-design / 6D-demonstrate / 6D-develop / 6D-document / 6D-debrief)
 
-> **Command presentation**: When showing any command to the user, always use the short form without the `six-d:` namespace prefix (e.g., `/6D done`, not `/six-d:6D done`). The namespace prefix is an internal Claude Code routing detail and must not be shown to users.
+**Command presentation**: When showing any command to the user, always use the short form without the `six-d:` namespace prefix (e.g., `/6D done`, NEVER(!) `/six-d:6D done`). The namespace prefix is an internal Claude Code routing detail and must not be shown to users.
 
 ---
 

@@ -75,6 +75,7 @@ Understand what limits the solution space and how goals interact.
 - **Do not let the conversation stay at the surface.** Dig beneath the first answer. Ask 'why', 'what if', 'how would you know', 'what are we assuming here'.
 - **Track open questions.** When something arises that cannot be resolved in the conversation (missing knowledge, external validation needed), note it explicitly as a research task.
 - **Periodically summarize** what you've understood so far and check alignment: "Let me make sure I'm tracking this correctly — here's what I've understood so far. Does this match your view?"
+- **Command presentation**: When showing any command to the user, always use the short form without the `six-d:` namespace prefix (e.g., `/6D done`, NEVER(!) `/six-d:6D done`). The namespace prefix is an internal Claude Code routing detail and must not be shown to users.
 
 ---
 

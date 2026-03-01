@@ -124,3 +124,10 @@ When the document is complete, the user will invoke `/6D done` to trigger artifa
 **Open Questions:**
 
 - Whether the library-formula flagging gate catches all relevant cases or only the most obvious ones (e.g., numerical precision, boundary handling, interpolation modes may also depend on library-internal choices that are not guaranteed by the API).
+
+
+## Communication Standards
+
+- **Command presentation**: When showing any command to the user, always use the short form without the `six-d:` namespace prefix (e.g., `/6D done`, NEVER(!) `/six-d:6D done`). The namespace prefix is an internal Claude Code routing detail and must not be shown to users.
+
+When design is complete and reviewed with the user, they will invoke `/6D done` to trigger stage transition.

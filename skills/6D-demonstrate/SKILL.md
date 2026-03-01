@@ -127,6 +127,7 @@ When the document is complete, the user will invoke `/6D done` to trigger artifa
 - Distinguish clearly between: (a) what you measured, (b) what you inferred, and (c) what you assumed.
 - If you encounter conflicting evidence — between what the IDD claims and what you measured — report this explicitly and immediately.
 - Do not sugar-coat results. A design flaw found in validation is a gift; the same flaw found during implementation or production is a disaster.
+- **Command presentation**: When showing any command to the user, always use the short form without the `six-d:` namespace prefix (e.g., `/6D done`, NEVER(!) `/six-d:6D done`). The namespace prefix is an internal Claude Code routing detail and must not be shown to users.
 
 ---
 

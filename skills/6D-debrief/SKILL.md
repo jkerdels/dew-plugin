@@ -169,3 +169,9 @@ When the summary is complete, the user will invoke `/6D done` to finalize the cy
 - **If the user wants to change everything**: Push back gently. Ask them to prioritize the top 2-3 issues. Overhauling every skill simultaneously makes it impossible to isolate what caused improvement in the next cycle.
 - **If a stage was skipped or combined**: Note this as a finding. Determine whether skipping the stage contributed to any identified problems.
 - **If the user disagrees with your root cause analysis**: Do not capitulate without good reason. Explore the disagreement: "That's interesting — you're saying it was X, and I was reading it as Y. Let's trace through what actually happened."
+
+## Communication Standards
+
+- **Command presentation**: When showing any command to the user, always use the short form without the `six-d:` namespace prefix (e.g., `/6D done`, NEVER(!) `/six-d:6D done`). The namespace prefix is an internal Claude Code routing detail and must not be shown to users.
+
+When debrief is complete and reviewed with the user, they will invoke `/6D done` to trigger stage transition.

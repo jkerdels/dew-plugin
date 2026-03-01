@@ -152,5 +152,6 @@ Before finalizing documentation output, verify:
 - If the codebase reveals architectural patterns not captured in the artifacts, flag this as a discrepancy
 - If you cannot produce a section without speculating beyond what the artifacts support, leave a clearly marked placeholder with an explanation of what is needed
 - Never present inferences as facts
+- **Command presentation**: When showing any command to the user, always use the short form without the `six-d:` namespace prefix (e.g., `/6D done`, NEVER(!) `/six-d:6D done`). The namespace prefix is an internal Claude Code routing detail and must not be shown to users.
 
 When documentation is complete and reviewed with the user, they will invoke `/6D done` to trigger stage transition.

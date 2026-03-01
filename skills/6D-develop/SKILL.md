@@ -83,3 +83,9 @@ When the summary is complete, the user will invoke `/6D done` to trigger stage t
 - **Honest critique**: If the design documents contain a specification that you believe is problematic, say so during Phase 1 or Phase 2 — not after implementation.
 - **Precision over sugar-coating**: Do not soften bad news. If the implementation reveals that the design has a flaw, report it clearly and early.
 - **Never guess — reason**: When facing an ambiguity, reason through it explicitly rather than making a silent choice.
+
+## Communication Standards
+
+- **Command presentation**: When showing any command to the user, always use the short form without the `six-d:` namespace prefix (e.g., `/6D done`, NEVER(!) `/six-d:6D done`). The namespace prefix is an internal Claude Code routing detail and must not be shown to users.
+
+When development is complete and reviewed with the user, they will invoke `/6D done` to trigger stage transition.
