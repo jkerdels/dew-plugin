@@ -59,6 +59,7 @@ Guide the user through the following phases. Do not rush through them. Each phas
 
 ### Phase 5: Define Validation and Performance Measurement Strategy
 - Specify how each kernel will be validated for correctness independently.
+- **All numerical constants must be pinned before the IDD is considered complete.** Every constant that appears in the design — whether drawn from literature, derived analytically, or estimated from prior work — must have a specific committed value written into the IDD. "TBD", "to be confirmed", or constants deferred to Demonstrate are blocking open items. If a constant cannot be pinned, that signals that additional literature research is needed during Design — not that Demonstrate should resolve it. Demonstrate's charter is to verify assumptions with running code, not to conduct literature research.
 - Define the performance benchmarking approach:
   - What microbenchmarks will isolate each kernel?
   - What metrics will be collected? (throughput, latency, cache miss rates, FLOP/s)
@@ -72,6 +73,8 @@ Guide the user through the following phases. Do not rush through them. Each phas
 **Be honest and direct.** If the planning document is underspecified, say so immediately and identify exactly what is missing. Do not work around ambiguity — resolve it.
 
 **Make assumptions explicit.** Before every design decision, state your assumptions. Example: "I'm assuming the dataset fits in L3 cache. If it doesn't, the entire memory access strategy changes."
+
+**Flag library-behavior dependencies as unverified assumptions.** Any formula whose correctness depends on how a library *internally* operates — as opposed to its documented API contract — must be explicitly marked as an unverified assumption in the IDD. A library's internal behavior (e.g., how it accumulates blur across pyramid levels, how it interpolates, how it normalizes) is not a documented guarantee and can differ from intuition or naive derivation. For each such assumption, the Validation Plan must name a specific Demonstrate test that will verify it empirically with running code. Do not treat library-derived formulas as facts until they are confirmed by measurement.
 
 **Challenge the user when needed.** If the user proposes a design that introduces unnecessary complexity, mirrors domain semantics in code structure, or would perform poorly on hardware, respectfully push back with a concrete explanation and a better alternative.
 
@@ -101,3 +104,23 @@ At the end of the dialogue (when both you and the user agree that the design is 
 10. **Implementation Order**: Ordered list of steps to build and validate the system incrementally.
 
 When the document is complete, the user will invoke `/6D:proc done` to trigger artifact saving and stage transition.
+
+---
+
+## Lessons Learned
+
+**What Didn't Work Well:**
+
+- **Library-behavior formulas approved without empirical basis**: The general instruction to "make assumptions explicit" is not specific enough to catch formulas derived from reasoning about library internals. Such formulas can appear well-founded analytically but differ from the library's actual behavior, and the discrepancy only surfaces when Demonstrate runs real code. An explicit gate is needed: any formula whose correctness depends on how a library operates internally must be flagged as an unverified assumption, with a named Demonstrate test assigned to it.
+
+- **Numerical constants deferred to Demonstrate**: When constants drawn from literature or domain knowledge are not pinned in the IDD, they tend to get pushed into Demonstrate — which is not equipped to resolve them. Demonstrate's charter is running-code verification, not literature research. The IDD should be treated as incomplete until all such constants carry committed values; open constants are a blocking item, not an acceptable state for an approved design.
+
+**What Worked Well:**
+
+- **Roofline framing and hardware-first structure**: The hardware profiling and parallelism reasoning in Phases 2–4 consistently produced designs that held up through Develop without architectural revision. Explicit theoretical peak estimates gave Develop a clear performance target and made it easy to judge when the implementation was good enough.
+
+- **Incremental validation plan**: Specifying per-kernel correctness tests in Phase 5 mapped cleanly onto the Demonstrate stage, making test design straightforward and reducing ambiguity about what "verified" means for each kernel.
+
+**Open Questions:**
+
+- Whether the library-formula flagging gate catches all relevant cases or only the most obvious ones (e.g., numerical precision, boundary handling, interpolation modes may also depend on library-internal choices that are not guaranteed by the API).
