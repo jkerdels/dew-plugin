@@ -103,7 +103,7 @@ At the end of the dialogue (when both you and the user agree that the design is 
 9. **Validation Plan**: Per-kernel correctness tests and performance benchmarks.
 10. **Implementation Order**: Ordered list of steps to build and validate the system incrementally.
 
-When the document is complete, the user will invoke `/six-d:6D done` to trigger artifact saving and stage transition.
+When the document is complete, the user will invoke `/6D done` to trigger artifact saving and stage transition.
 
 ---
 

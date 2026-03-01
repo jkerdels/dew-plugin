@@ -7,22 +7,24 @@ description: 6D workflow orchestrator. Manages the six-stage development process
 
 **6D** is a structured engineering process for building software with rigor and measurability. Every stage is an interactive conversation — this orchestrator loads context and hands off to the appropriate stage skill, which runs directly in the current session.
 
-| Stage | Skill | Artifact |
-|-------|-------|----------|
-| **Discover** | `/six-d:6D-discover` | `docs/6D/01-discover.md` |
-| **Design** | `/six-d:6D-design` | `docs/6D/02-design.md` |
-| **Demonstrate** | `/six-d:6D-demonstrate` | `design-verification/DESIGN_VERIFICATION.md` |
-| **Develop** | `/six-d:6D-develop` | production code in repo |
-| **Document** | `/six-d:6D-document` | `docs/` Hugo site |
-| **Debrief** | `/six-d:6D-debrief` | `docs/6D/06-debrief.md` |
+| Stage | Plugin | Skill | Artifact |
+|-------|--------|-------|----------|
+| **Discover** | six-d | `/6D-discover` | `docs/6D/01-discover.md` |
+| **Design** | six-d | `/6D-design` | `docs/6D/02-design.md` |
+| **Demonstrate** | six-d | `/6D-demonstrate` | `design-verification/DESIGN_VERIFICATION.md` |
+| **Develop** | six-d | `/6D-develop` | production code in repo |
+| **Document** | six-d | `/6D-document` | `docs/` Hugo site |
+| **Debrief** | six-d | `/6D-debrief` | `docs/6D/06-debrief.md` |
 
 **Commands:**
-- `/six-d:6D` — continue from the current active stage
-- `/six-d:6D new` — start a new 6D project
-- `/six-d:6D done` — complete the current stage: write artifact, update state, commit, then prompt for `/clear`
-- `/six-d:6D status` — show current state without entering a stage
-- `/six-d:6D back <stage>` — backtrack to an earlier stage
-- `/six-d:<stage-name>` — jump to a named stage (6D-discover / 6D-design / 6D-demonstrate / 6D-develop / 6D-document / 6D-debrief)
+- `/6D` — continue from the current active stage
+- `/6D new` — start a new 6D project
+- `/6D done` — complete the current stage: write artifact, update state, commit, then prompt for `/clear`
+- `/6D status` — show current state without entering a stage
+- `/6D back <stage>` — backtrack to an earlier stage
+- `/6D-<stage-name>` — jump to a named stage (6D-discover / 6D-design / 6D-demonstrate / 6D-develop / 6D-document / 6D-debrief)
+
+> **Command presentation**: When showing any command to the user, always use the short form without the `six-d:` namespace prefix (e.g., `/6D done`, not `/six-d:6D done`). The namespace prefix is an internal Claude Code routing detail and must not be shown to users.
 
 ---
 
@@ -100,9 +102,9 @@ Then invoke the stage skill via the Skill tool:
 
 ---
 
-### Step 4 — Complete Stage (triggered by `/six-d:6D done`)
+### Step 4 — Complete Stage (triggered by `/6D done`)
 
-When the user invokes `/six-d:6D done`:
+When the user invokes `/6D done`:
 
 1. **Write the stage artifact** by synthesizing the conversation:
    - discover → write `docs/6D/01-discover.md`
@@ -133,7 +135,7 @@ When the user invokes `/six-d:6D done`:
 
 ### Backtrack Protocol
 
-When the user invokes `/six-d:6D back <stage>`:
+When the user invokes `/6D back <stage>`:
 
 1. Ask for the reason if not provided: "What did you find that requires going back to [stage]?"
 
@@ -151,7 +153,7 @@ When the user invokes `/six-d:6D back <stage>`:
 
 ### Status Report
 
-When `/six-d:6D status` is invoked:
+When `/6D status` is invoked:
 
 ```
 6D: <project-name> (<type>)

@@ -115,7 +115,7 @@ Produce `design-verification/DESIGN_VERIFICATION.md` containing:
 [Concrete, actionable recommendations: proceed / revise / reject for each design element]
 ```
 
-When the document is complete, the user will invoke `/six-d:6D done` to trigger artifact saving and stage transition.
+When the document is complete, the user will invoke `/6D done` to trigger artifact saving and stage transition.
 
 ---
 
