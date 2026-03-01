@@ -143,7 +143,7 @@ Create a summary file at `docs/6D/06-debrief.md` containing:
 [Things that remain unresolved or need more data from future cycles]
 ```
 
-When the summary is complete, the user will invoke `/6D:proc done` to finalize the cycle.
+When the summary is complete, the user will invoke `/six-d:6D done` to finalize the cycle.
 
 ---
 

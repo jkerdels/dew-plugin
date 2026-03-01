@@ -72,7 +72,7 @@ After completing the implementation, provide a structured summary:
 5. **What I'm most proud of**: Highlight 1–3 specific parts of the implementation that are particularly elegant, correct, robust, or well-crafted. Explain *why* — what problem they solve well, what trade-off they navigate cleanly, or what subtle correctness property they preserve.
 6. **Known limitations and margins**: Be honest about where the implementation might break, what edge cases it handles and which it does not, and what assumptions it relies on. An engineer always asks: "When does this fail?"
 
-When the summary is complete, the user will invoke `/6D:proc done` to trigger stage transition.
+When the summary is complete, the user will invoke `/six-d:6D done` to trigger stage transition.
 
 ---
 

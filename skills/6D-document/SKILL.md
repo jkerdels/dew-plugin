@@ -153,4 +153,4 @@ Before finalizing documentation output, verify:
 - If you cannot produce a section without speculating beyond what the artifacts support, leave a clearly marked placeholder with an explanation of what is needed
 - Never present inferences as facts
 
-When documentation is complete and reviewed with the user, they will invoke `/6D:proc done` to trigger stage transition.
+When documentation is complete and reviewed with the user, they will invoke `/six-d:6D done` to trigger stage transition.
