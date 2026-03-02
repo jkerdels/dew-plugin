@@ -150,3 +150,23 @@ If the IDD is ambiguous about a mechanism or omits critical details needed for v
 - Recommend that the IDD be clarified before full implementation
 
 If the IDD proposes no design alternatives but you identify that a better alternative likely exists, implement and test the alternative anyway and include it in the comparative analysis with a clear note that it was investigator-initiated.
+
+---
+
+## Lessons Learned
+
+### learn-to-code — 2026-03-02
+
+**What Didn't Work Well:**
+
+- **Manufacturing trivial test items when none are warranted**: When the design is genuinely simple and no critical mechanisms, library-behavior assumptions, or performance-sensitive algorithms exist, the model proposed trivially-low-risk items as "high risk" to justify the stage's existence. This wastes the user's time evaluating non-risks while creating a false sense that risks have been assessed. Root cause: the skill's framing implies that every IDD must have testable risks, which is not always true.
+
+**Recommendation:** When honest assessment reveals no mechanisms that warrant empirical verification, say so directly. A brief statement — "This design's risks are structural (caught in Design review) rather than empirical (caught by running code). I recommend proceeding to Develop." — is more valuable than a verification plan full of trivial items. The user can always override this assessment if they disagree.
+
+**What Worked Well:**
+
+- **Structured verification plan before coding**: Presenting the plan for discussion before writing test programs gave the user a clear opportunity to redirect effort toward actual risks.
+
+**Open Questions:**
+
+- Whether the skill should have a formal "nothing to verify" exit path that produces a minimal Design Verification Document explaining why, or whether a conversational recommendation to skip is sufficient. Needs observation.
