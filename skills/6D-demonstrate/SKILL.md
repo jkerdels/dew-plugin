@@ -155,8 +155,6 @@ If the IDD proposes no design alternatives but you identify that a better altern
 
 ## Lessons Learned
 
-### learn-to-code — 2026-03-02
-
 **What Didn't Work Well:**
 
 - **Manufacturing trivial test items when none are warranted**: When the design is genuinely simple and no critical mechanisms, library-behavior assumptions, or performance-sensitive algorithms exist, the model proposed trivially-low-risk items as "high risk" to justify the stage's existence. This wastes the user's time evaluating non-risks while creating a false sense that risks have been assessed. Root cause: the skill's framing implies that every IDD must have testable risks, which is not always true.

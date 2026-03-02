@@ -89,7 +89,7 @@ Fill in remaining details:
 - External dependencies: libraries, formats, protocols. For each: what is the documented API contract? What behavior are we assuming beyond the contract? Flag any library-internal behavior assumptions as unverified — these must be marked for Demonstrate-stage verification.
 - **All numerical constants must be pinned.** Every constant — from literature, derived analytically, or estimated — must have a committed value. "TBD" is a blocking open item. If a constant cannot be pinned, that signals additional research is needed *now*, not during Demonstrate.
 - Build structure: targets, include paths, dependency management.
-- C++ feature usage: which language features are used and why, considering the project's audience and design perspectives.
+- Programming Language feature usage: which language features are used and why, considering the project's audience and design perspectives.
 
 ### Phase 7: Validation and Implementation Plan
 
@@ -142,35 +142,6 @@ When the document is complete, the user will invoke `/6D done` to trigger artifa
 
 ---
 
-## Lessons Learned
-
-### learn-to-code — 2026-03-02
-
-**What Didn't Work Well:**
-
-- **v1 presented complete architectures without exploring alternatives**: The model jumped to a full design in Phase 4 without discussing alternative approaches for individual decisions. The user could not understand *why* specific choices were made because the exploration was not visible. Root cause: Phase 4 instructed the model to "Define" data structures, modules, and data flow — a specification task, not an exploration task.
-
-- **Type vs. instance conflation went undetected**: A 1:1 mapping between TileType (a category enum) and tile assets (per-instance visual variants) was assumed without surfacing it as a decision point. This was only caught two stages later during Develop. Root cause: the skill lacked an explicit instruction to distinguish types from instances when modeling data.
-
-- **Performance-engineering persona mismatched non-performance projects**: The v1 persona ("elite systems software architect and performance engineer") primed the model to optimize for hardware utilization on a project where the stated priority was code clarity and pedagogical value. Design decisions were evaluated through the wrong lens.
-
-- **Library-behavior formulas approved without empirical basis**: The general instruction to "make assumptions explicit" was not specific enough to catch formulas derived from reasoning about library internals. An explicit gate was added requiring such formulas to be flagged as unverified assumptions.
-
-- **Numerical constants deferred to Demonstrate**: Constants pushed to Demonstrate — which is not equipped to resolve them — created blocking gaps. Added explicit rule that constants are blocking open items in the IDD.
-
-**What Worked Well:**
-
-- **Incremental validation plan**: Specifying per-component correctness tests in the final phase mapped cleanly onto downstream stages.
-
-- **Explicit assumption language**: The instruction to state assumptions before decisions, while insufficient alone, established a useful cultural norm in the dialogue.
-
-**Open Questions:**
-
-- Whether the alternative-exploration gates are sufficient to prevent the model from converging prematurely, or whether additional structural mechanisms (e.g., requiring the user to *select* from alternatives rather than the model recommending one) are needed. Needs observation in future cycles.
-
-- Whether the coarse-to-fine progression is rigid enough. Some projects may benefit from a different ordering (e.g., data-model-first vs. architecture-first). Needs observation.
-
----
 
 ## Communication Standards
 
