@@ -41,6 +41,8 @@ Before writing any code, produce a concise verification plan:
 - Identify what a passing result looks like vs. a failing result
 - Flag which tests have design-alternative comparisons
 
+**Citation rule**: Every item in the verification plan must cite the specific IDD section or demonstrate node context it originates from. If a concern cannot be traced to the design document, it does not belong in the plan unless explicitly flagged as investigator-initiated and accompanied by a concrete justification for why the IDD missed a genuine risk.
+
 **Present this plan to the user and discuss it before proceeding.** Adjust based on the user's priorities and risk assessment.
 
 ### Step 3: Implement Test Programs
@@ -230,6 +232,10 @@ Use `dag_next` to get the next actionable sub-task. Work through it in the conve
 - **Manufacturing trivial test items when none are warranted**: When the design is genuinely simple and no critical mechanisms, library-behavior assumptions, or performance-sensitive algorithms exist, the model proposed trivially-low-risk items as "high risk" to justify the stage's existence. This wastes the user's time evaluating non-risks while creating a false sense that risks have been assessed. Root cause: the skill's framing implies that every IDD must have testable risks, which is not always true.
 
 **Recommendation:** When honest assessment reveals no mechanisms that warrant empirical verification, say so directly. A brief statement — "This design's risks are structural (caught in Design review) rather than empirical (caught by running code). I recommend proceeding to Develop." — is more valuable than a verification plan full of trivial items. The user can always override this assessment if they disagree.
+
+- **Inflating scope with plausible-sounding but unsourced concerns**: The model adds verification items that sound reasonable from general engineering knowledge but are not grounded in the IDD or the demonstrate seed nodes. This inflates the verification plan, wastes time, and creates a false impression of thoroughness. Root cause: pressure to appear comprehensive, combined with insufficient discipline about tracing every claim back to its source document.
+
+**Recommendation:** Apply strict citation discipline — every item in the verification plan must cite the specific IDD section or demonstrate node context it originates from. If a concern cannot be traced to the design document, it does not belong in the plan unless explicitly flagged as investigator-initiated and accompanied by a concrete justification for why the IDD missed a genuine risk. Do not add verification items beyond what the IDD and demonstrate nodes specify unless you explicitly flag them as investigator-initiated additions and justify why the IDD missed a genuine risk.
 
 **What Worked Well:**
 
