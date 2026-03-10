@@ -12,12 +12,12 @@ Discover → Design → Demonstrate → Develop → Document → Debrief
 
 | # | Stage | What Happens | Artifact |
 |---|-------|-------------|----------|
-| 1 | **Discover** | Deep problem domain exploration. Surfaces assumptions, defines measurable success criteria, maps constraints and stakeholders. No implementation talk. | `docs/6D/01-discover.md` |
-| 2 | **Design** | Hardware-aware implementation design. Data layouts, compute kernels, module structure — driven by the hardware's capabilities, not the problem's semantics. | `docs/6D/02-design.md` |
-| 3 | **Demonstrate** | Empirical validation of critical design assumptions. Minimal isolated test programs, measured against theoretical hardware limits. Failures caught here, not in production. | `design-verification/DESIGN_VERIFICATION.md` |
+| 1 | **Discover** | Deep problem domain exploration. Surfaces assumptions, defines measurable success criteria, maps constraints and stakeholders. No implementation talk. | `.6d/docs/01-discover.md` |
+| 2 | **Design** | Hardware-aware implementation design. Data layouts, compute kernels, module structure — driven by the hardware's capabilities, not the problem's semantics. | `.6d/docs/02-design.md` |
+| 3 | **Demonstrate** | Empirical validation of critical design assumptions. Minimal isolated test programs, measured against theoretical hardware limits. Failures caught here, not in production. | `.6d/design-verification/DESIGN_VERIFICATION.md` |
 | 4 | **Develop** | Production code implementation. Structure defined and agreed before a single line is written. Incremental validation throughout. | (codebase) |
 | 5 | **Document** | Developer-facing Hugo documentation site. Synthesizes all upstream artifacts into architecture docs, design decisions, internals, and codebase map. | `docs/` Hugo site |
-| 6 | **Debrief** | Structured retrospective. Root-cause analysis of what worked and what didn't, with findings written back into the skill configurations for the next cycle. | `docs/6D/06-debrief.md` |
+| 6 | **Debrief** | Structured retrospective. Root-cause analysis of what worked and what didn't, with findings written back into the skill configurations for the next cycle. | `.6d/docs/06-debrief.md` |
 
 ---
 
@@ -76,6 +76,20 @@ The orchestrator asks for a project name and type, creates the state file, and d
 
 Writes the stage artifact, commits it to git, and prompts you to `/clear` before the next stage (each stage runs with a clean context window).
 
+### Pause mid-stage and resume later
+
+```
+/6D pause
+```
+
+Synthesizes the conversation into a context snapshot at `.6d/context.md` and commits it. Safe to quit Claude after this.
+
+```
+/6D resume
+```
+
+Restores the context snapshot and re-enters the active stage with full awareness of prior progress.
+
 ### Jump directly to a stage
 
 ```
@@ -94,6 +108,35 @@ Writes the stage artifact, commits it to git, and prompts you to `/clear` before
 ```
 
 Records the reason in the state file and reloads that stage's context.
+
+---
+
+## Optional: Dependency Graph MCP
+
+6D natively integrates with [dependency-graph-mcp](https://github.com/jkerdels/dependency-graph-mcp) when it is available. Each stage skill checks for the MCP at startup and activates graph tracking automatically — no configuration needed.
+
+### What the graph adds
+
+**Work tracking per stage**: each conversation phase becomes a graph node. `dag_next` drives the order; `dag_done` records outcomes with concrete summaries. The graph enforces that phases are completed before the next begins.
+
+**Cross-stage handoff nodes**: stages plant seeds in the graph for downstream stages to pick up and elaborate:
+
+| Stage creates | Picked up by |
+|---------------|-------------|
+| `demonstrate.<assumption>` seeds — critical assumptions needing empirical validation | Demonstrate, which expands each into a `design→implement→execute→analyze` sub-chain |
+| `develop.<component>` seeds — one per implementation component | Develop, which expands each into `structure→implement→validate` |
+
+This gives the project a single, growing dependency graph that spans the entire development cycle — from discovery assumptions through to implementation components.
+
+**Artifact condensation**: when the graph is active, written artifacts (planning report, IDD, DVD, implementation summary, debrief) are condensed. The graph carries the reasoning trail and decision log; artifacts focus on synthesis and conclusions. Specific sections that can be shortened are called out in each stage skill.
+
+**Retrospective evidence**: the Debrief stage reads the full project graph — node counts per stage, PASS/FAIL patterns on `demonstrate.*` nodes, invalidation cascades (signals rework), and planned-vs-actual component structure — as primary evidence for the retrospective.
+
+### Installation
+
+Follow the setup instructions at [dependency-graph-mcp](https://github.com/jkerdels/dependency-graph-mcp). Once the MCP server is registered in Claude Code, 6D detects it automatically.
+
+The graph is persisted at `.6d/graph.json` in your project repository and committed alongside other artifacts at each stage transition and pause.
 
 ---
 
@@ -117,29 +160,45 @@ Records the reason in the state file and reloads that stage's context.
 
 ```
 .claude-plugin/
-  plugin.json       — plugin manifest (name, version, description)
+  plugin.json            — plugin manifest (name, version, description)
 skills/
-  proc/             — orchestrator: state, context loading, stage transitions
-  discover/         — domain exploration and planning
-  design/           — hardware-aware implementation design
-  demonstrate/      — empirical design validation
-  develop/          — production code implementation
-  document/         — Hugo documentation site generator
-  debrief/          — retrospective facilitator
+  6D/                    — orchestrator: state, context loading, stage transitions
+  6D-discover/           — domain exploration and planning
+  6D-design/             — hardware-aware implementation design
+  6D-demonstrate/        — empirical design validation
+  6D-develop/            — production code implementation
+  6D-document/           — Hugo documentation site generator
+  6D-debrief/            — retrospective facilitator
 README.md
 ```
 
 ---
 
-## State File
+## Project State
 
-The workflow maintains `.claude/6D-state.md` in your project repository, tracking:
+The workflow maintains `.6d/state.md` in your project repository, tracking:
 - Current active stage and status
 - Artifact completion status
 - Stage log with visit counts and dates
 - Backtrack log with reasons
 
-This file is committed to git at each stage transition, giving you a full audit trail of the development cycle.
+All 6D files live under `.6d/` in your project:
+
+```
+.6d/
+  state.md                          — workflow state
+  graph.json                        — dependency graph (if MCP is active)
+  context.md                        — pause snapshot (present only when paused)
+  docs/
+    01-discover.md
+    02-design.md
+    06-debrief.md
+  design-verification/
+    DESIGN_VERIFICATION.md
+    <test programs>
+```
+
+Every state transition is committed to git, giving you a full audit trail of the development cycle.
 
 ---
 
