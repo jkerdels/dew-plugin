@@ -89,6 +89,8 @@ Read the `Active Stage` from the save state. Load context for the stage (read an
 - **document**: Read `.6d/docs/01-discover.md`, `.6d/docs/02-design.md`, and `.6d/design-verification/DESIGN_VERIFICATION.md` and present all three before invoking the skill.
 - **debrief**: Read `.6d/state.md` (full contents including backtrack log) and present it before invoking the skill.
 
+If the `mcp__dependency-graph__dag_status` tool is available, also call `dag_status` after loading artifacts to show a brief project graph summary (what's done, what's pending across all stage namespaces). This gives the user and the stage skill an instant orientation on overall progress.
+
 **After loading context**, briefly tell the user:
 - Which stage we are entering
 - What context was loaded
@@ -124,7 +126,7 @@ When the user invokes `/6D done`:
    - Mark the artifact as complete in the Artifacts table
 
 3. **Git commit** (if in a git repo):
-   - Stage `.6d/state.md` and any new/changed files in `.6d/docs/` or `.6d/design-verification/`
+   - Stage `.6d/state.md`, `.6d/graph.json` (if it exists), and any new/changed files in `.6d/docs/` or `.6d/design-verification/`
    - Message: `6D(<stage>): complete <stage-name> for <project-name>`
    - Example: `6D(discover): complete discovery for retina-pipeline`
    - Do **not** push unless explicitly asked
@@ -181,7 +183,7 @@ When the user invokes `/6D pause`:
 ```
 
 2. **Git commit** (if in a git repo):
-   - Stage `.6d/context.md`
+   - Stage `.6d/context.md` and `.6d/graph.json` (if it exists)
    - Message: `6D(pause): <stage> for <project-name>`
 
 3. **Tell the user**: "Context saved to `.6d/context.md`. It's safe to quit. Run `/6D resume` in a new session to pick up where we left off."
@@ -196,11 +198,13 @@ When the user invokes `/6D resume`:
 
 2. **Read `.6d/context.md`** and present its contents to the user as a recap: "Here's where we left off:" followed by the snapshot.
 
-3. **Load the normal stage context** (same as Step 3 — read prerequisite artifacts for the active stage).
+3. **Reload the graph** (if `mcp__dependency-graph__dag_status` is available): call `dag_load(".6d/graph.json")` followed by `dag_save(".6d/graph.json", auto_save=true)` to restore and re-enable auto-save. Then call `dag_status` and include a brief graph summary in the recap — which nodes are done, which are in-progress, what is next.
 
-4. **Invoke the stage skill**, prepending the context snapshot so the skill has full awareness of prior progress.
+4. **Load the normal stage context** (same as Step 3 — read prerequisite artifacts for the active stage).
 
-5. **Delete `.6d/context.md`** after the stage skill is successfully invoked (the context is now live in the conversation). Do **not** commit the deletion — it will be cleaned up by the next `/6D done` or `/6D pause` commit.
+5. **Invoke the stage skill**, prepending both the context snapshot and the graph status so the skill has full awareness of prior progress. The stage skill's own DAG Integration section will then take over, using `dag_next` to resume from the correct point.
+
+6. **Delete `.6d/context.md`** after the stage skill is successfully invoked (the context is now live in the conversation). Do **not** commit the deletion — it will be cleaned up by the next `/6D done` or `/6D pause` commit.
 
 ---
 

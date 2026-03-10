@@ -143,6 +143,67 @@ When the document is complete, the user will invoke `/6D done` to trigger artifa
 ---
 
 
+## DAG Integration
+
+**Availability check**: If `mcp__dependency-graph__dag_status` is in your available tools, follow all steps in this section. If it is not available, skip the entire section and proceed without graph tracking.
+
+### Session Start
+
+1. Call `dag_load(".6d/graph.json")`. The graph will contain `demonstrate.*` seed nodes created by Discover — note them.
+2. Call `dag_save(".6d/graph.json", auto_save=true)` to enable auto-save.
+3. Call `dag_status` to orient yourself. Note any existing `demonstrate.*` nodes — these are assumptions that already need validation and will inform Phase 6 work.
+4. Create own-stage nodes via `dag_create_nodes`:
+
+```json
+[
+  {"id": "design.phase1", "task": "Read and understand the planning document; establish shared understanding", "priority": 8},
+  {"id": "design.phase2", "task": "Negotiate design perspectives and evaluation criteria", "priority": 8},
+  {"id": "design.phase3", "task": "Coarse architecture: subsystems, data flow, coupling", "priority": 7},
+  {"id": "design.phase4", "task": "Data modeling: core types, layouts, invariants", "priority": 6},
+  {"id": "design.phase5", "task": "Module interfaces: function signatures, error handling", "priority": 6},
+  {"id": "design.phase6", "task": "Detail refinement: algorithms, external dependencies, constants", "priority": 5},
+  {"id": "design.phase7", "task": "Validation plan and step-by-step implementation order", "priority": 5},
+  {"id": "design.idd", "task": "Produce the Implementation Design Document", "priority": 10}
+]
+```
+
+5. Wire the phase chain via `dag_add_dependencies` (each phase depends on the previous; `design.idd` depends on `design.phase7`).
+
+6. Use `dag_next` to drive the dialogue. Mark each phase done with a summary of key decisions before proceeding.
+
+### Artifact Condensation
+
+When DAG is active, the `dag_done` summaries on `design.phase1` through `design.phase7` already capture the key decisions and rationale of each phase. The IDD can therefore be condensed:
+
+- **Section 12** (Implementation Order): the `develop.*` nodes with their priorities and dependencies ARE the implementation order. The IDD can describe the ordering in brief prose and note "full step breakdown available in graph nodes `develop.*`".
+- **Section 11** (Validation Plan): the `demonstrate.*` nodes with their context fields ARE the validation plan. The IDD can summarize the validation approach and note "individual verification targets defined in graph nodes `demonstrate.*`".
+- **Section 13** (Decision Log): the `dag_done` summaries on `design.phase3` through `design.phase6` already record each decision with its alternatives and rationale. The IDD Decision Log can be a condensed table (decision | choice | rationale in one sentence) rather than full prose elaboration per decision.
+- **Sections 1–10** remain full — these define the design itself and are the primary reference for Demonstrate and Develop stages.
+
+### Handoff Nodes for Demonstrate
+
+During Phase 6, when you flag a library-behavior assumption (a dependency whose correctness relies on undocumented internal behavior rather than the documented API contract), create a `demonstrate.*` node:
+
+- **ID**: `demonstrate.<behavior-slug>`
+- **Task**: `"Validate library behavior: <specific behavior assumed>"`
+- **Priority**: 8 (these are pre-implementation blockers)
+- **Context**: The exact API call or behavior assumed, the section of the IDD that depends on it, and what a passing test looks like
+
+If a `demonstrate.*` node for the same concern was already created by Discover, append to it via `dag_log` rather than creating a duplicate.
+
+### Handoff Nodes for Develop
+
+After Phase 7 (Implementation Plan), create one `develop.*` node per implementation step in the agreed plan:
+
+- **ID**: `develop.<component-slug>`
+- **Task**: `"Implement: <component description>"`
+- **Priority**: Reflect the implementation order — first steps higher (e.g., 8), later steps lower (e.g., 4)
+- **Context**: The relevant IDD section, expected inputs/outputs, module boundaries, and any design constraints on this component
+
+Wire inter-component dependencies if the plan specifies ordering: if component B cannot begin until component A is done, add that dependency via `dag_add_dependency`.
+
+---
+
 ## Communication Standards
 
 - **Command presentation**: When showing any command to the user, always use the short form without the `six-d:` namespace prefix (e.g., `/6D done`, NEVER(!) `/six-d:6D done`). The namespace prefix is an internal Claude Code routing detail and must not be shown to users.

@@ -153,6 +153,76 @@ If the IDD proposes no design alternatives but you identify that a better altern
 
 ---
 
+## DAG Integration
+
+**Availability check**: If `mcp__dependency-graph__dag_status` is in your available tools, follow all steps in this section. If it is not available, skip the entire section and proceed without graph tracking.
+
+### Session Start
+
+1. Call `dag_load(".6d/graph.json")`. The graph will contain `demonstrate.*` seed nodes created by Discover and Design.
+2. Call `dag_save(".6d/graph.json", auto_save=true)` to enable auto-save.
+3. Call `dag_status` and `dag_show` to enumerate all existing `demonstrate.*` nodes — these are your work items.
+4. Create two own-stage orchestration nodes:
+
+```json
+[
+  {"id": "demonstrate.plan", "task": "Assess all demonstrate seeds, produce verification plan, discuss with user", "priority": 10},
+  {"id": "demonstrate.dvd", "task": "Produce the Design Verification Document", "priority": 10}
+]
+```
+
+`demonstrate.dvd` will depend on `demonstrate.plan` plus all seed nodes — wire this **after** expanding the seeds (Step 6 below).
+
+### Expanding Seed Nodes
+
+After `demonstrate.plan` is done (verification plan agreed with user), expand each `demonstrate.<slug>` seed into a sub-task chain via `dag_create_nodes` and `dag_add_dependencies`:
+
+Sub-tasks to create for each seed (replace `<slug>` with the actual seed ID fragment):
+
+```json
+[
+  {"id": "demonstrate.<slug>.design",    "task": "Design the test: hypothesis, metric, pass/fail criterion",    "priority": 8},
+  {"id": "demonstrate.<slug>.implement", "task": "Write test program in .6d/design-verification/",              "priority": 7},
+  {"id": "demonstrate.<slug>.execute",   "task": "Run test, collect concrete measurements",                     "priority": 7},
+  {"id": "demonstrate.<slug>.analyze",   "task": "Analyze results; determine PASS/FAIL/CONDITIONAL and design implication", "priority": 6}
+]
+```
+
+Then wire the chain so each sub-task depends on the previous, and the **seed node depends on `<slug>.analyze`**:
+
+```json
+[
+  {"node_id": "demonstrate.<slug>.implement", "depends_on": "demonstrate.<slug>.design"},
+  {"node_id": "demonstrate.<slug>.execute",   "depends_on": "demonstrate.<slug>.implement"},
+  {"node_id": "demonstrate.<slug>.analyze",   "depends_on": "demonstrate.<slug>.execute"},
+  {"node_id": "demonstrate.<slug>",           "depends_on": "demonstrate.<slug>.analyze"}
+]
+```
+
+This makes `<slug>.design` immediately actionable, and the seed only becomes completable after the full chain is done.
+
+Repeat for every seed. Then add dependencies to `demonstrate.dvd` on all seeds and on `demonstrate.plan`.
+
+### Artifact Condensation
+
+When DAG is active, each seed node's `dag_done` summary already records the outcome (PASS/FAIL/CONDITIONAL), key measurement, and design implication. The Design Verification Document can therefore be condensed:
+
+- **Per-mechanism sections**: replace the full prose section per mechanism with a summary table:
+
+  | Node ID | Hypothesis | Result | Key Measurement | Design Implication |
+  |---------|-----------|--------|-----------------|-------------------|
+  | `demonstrate.<slug>` | ... | PASS/FAIL/CONDITIONAL | ... | ... |
+
+  Detailed measurements, test program paths, and analysis prose are still required — but they live in the sub-node summaries (`<slug>.analyze` dag_done entry) which the table can reference.
+- **Summary section** and **Risk Assessment** remain full — these are synthesized judgements not captured by individual node outcomes.
+- **Recommendations** remain full — these are forward-looking and not captured by the graph.
+
+### Driving Work
+
+Use `dag_next` to get the next actionable sub-task. Work through it in the conversation, then call `dag_done(id, summary)`. When all sub-tasks for a seed are done, mark the seed itself done with: PASS/FAIL/CONDITIONAL + key measurement + design implication.
+
+---
+
 ## Lessons Learned
 
 **What Didn't Work Well:**

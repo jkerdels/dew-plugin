@@ -170,6 +170,74 @@ When the summary is complete, the user will invoke `/6D done` to finalize the cy
 - **If a stage was skipped or combined**: Note this as a finding. Determine whether skipping the stage contributed to any identified problems.
 - **If the user disagrees with your root cause analysis**: Do not capitulate without good reason. Explore the disagreement: "That's interesting — you're saying it was X, and I was reading it as Y. Let's trace through what actually happened."
 
+## DAG Integration
+
+**Availability check**: If `mcp__dependency-graph__dag_status` is in your available tools, follow all steps in this section. If it is not available, skip the entire section and proceed without graph tracking.
+
+### Session Start
+
+1. Call `dag_load(".6d/graph.json")`. The graph holds the full record of the project: every task created, every dependency wired, every outcome recorded.
+2. Call `dag_save(".6d/graph.json", auto_save=true)` to enable auto-save.
+3. Call `dag_show` and `dag_status` to get a complete picture. Present the graph summary to the user as part of Phase 1 orientation:
+   - How many nodes exist per stage namespace (`discover.*`, `design.*`, `demonstrate.*`, `develop.*`, `document.*`)?
+   - Are there any nodes still pending, in-progress, or invalidated? Unfinished nodes are a finding.
+   - Which `demonstrate.*` nodes were PASS vs. FAIL/CONDITIONAL (from their done summaries)?
+   - Does the `develop.*` node structure match what Design planned, or were components added/removed?
+   - Any invalidation cascades? (Signals rework — explore why during the retrospective.)
+
+4. Create own-stage nodes via `dag_create_nodes`:
+
+```json
+[
+  {"id": "debrief.orientation",     "task": "Project orientation: artifact inventory, graph review, backtrack review",  "priority": 8},
+  {"id": "debrief.stage-review",    "task": "Stage-by-stage assessment with the user",                                  "priority": 7},
+  {"id": "debrief.pattern-analysis","task": "Cross-stage pattern analysis: recurring failures, handoff breakdowns",     "priority": 6},
+  {"id": "debrief.skill-findings",  "task": "Synthesize skill-specific findings with root causes",                      "priority": 6},
+  {"id": "debrief.lessons-write",   "task": "Write confirmed lessons to SKILL.md files",                               "priority": 8},
+  {"id": "debrief.summary",         "task": "Produce the debrief document at .6d/docs/06-debrief.md",                  "priority": 10}
+]
+```
+
+5. Wire the chain via `dag_add_dependencies`:
+
+```json
+[
+  {"node_id": "debrief.stage-review",    "depends_on": "debrief.orientation"},
+  {"node_id": "debrief.pattern-analysis","depends_on": "debrief.stage-review"},
+  {"node_id": "debrief.skill-findings",  "depends_on": "debrief.pattern-analysis"},
+  {"node_id": "debrief.lessons-write",   "depends_on": "debrief.skill-findings"},
+  {"node_id": "debrief.summary",         "depends_on": "debrief.lessons-write"}
+]
+```
+
+6. Use `dag_next` to drive the retrospective phases. Mark each done with a concrete summary.
+
+### Artifact Condensation
+
+When DAG is active, the graph holds a complete record of the project's execution. The debrief document can therefore be significantly condensed:
+
+- **Stage-by-Stage Assessment**: replace detailed per-stage prose with a structured table drawn from `dag_done` summaries:
+
+  | Stage | Nodes | Done | Invalidated | Key finding |
+  |-------|-------|------|-------------|-------------|
+  | discover | N | N | 0 | ... |
+  | ... | | | | |
+
+  Prose elaboration is only needed for stages with findings that require causal analysis.
+- **Key Insights** and **Recommendations for Next Cycle** remain full — these are synthesized conclusions not captured by the graph.
+- **Skill Changes Made** remains full — this is the primary actionable output of the debrief.
+- The **Graph Statistics** section (planned below) replaces the need to reconstruct timeline and rework data from memory.
+
+### Graph as Retrospective Evidence
+
+Use the project graph data directly in the assessment:
+- **Planned vs. actual**: Compare `develop.*` nodes (what Design planned) against what was actually implemented.
+- **Assumption health**: Review `demonstrate.*` node summaries for PASS/FAIL patterns — high FAIL rates signal weak design or poor assumption surfacing in Discover.
+- **Rework signals**: Invalidated nodes in the final graph are direct evidence of rework. For each, ask: what triggered the invalidation and could it have been caught earlier?
+- Include a **Graph Statistics** section in the debrief document: total nodes, per-stage counts, done/pending/invalidated breakdown, any dependencies that were added after initial wiring (late dependencies = late design changes).
+
+---
+
 ## Communication Standards
 
 - **Command presentation**: When showing any command to the user, always use the short form without the `six-d:` namespace prefix (e.g., `/6D done`, NEVER(!) `/six-d:6D done`). The namespace prefix is an internal Claude Code routing detail and must not be shown to users.

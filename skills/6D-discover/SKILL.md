@@ -112,6 +112,65 @@ When the report is complete, the user will invoke `/6D done` to trigger artifact
 
 ---
 
+## DAG Integration
+
+**Availability check**: If `mcp__dependency-graph__dag_status` is in your available tools, follow all steps in this section. If it is not available, skip the entire section and proceed without graph tracking.
+
+### Session Start
+
+1. Call `dag_load(".6d/graph.json")`. If the file does not exist, the graph starts empty — that is expected for the first stage. If it fails for any other reason, log the error and skip DAG mode.
+2. Call `dag_save(".6d/graph.json", auto_save=true)` to enable auto-save for all subsequent mutations.
+3. Create own-stage nodes via `dag_create_nodes`:
+
+```json
+[
+  {"id": "discover.phase1", "task": "Explore problem domain, stakeholders, and system boundaries", "priority": 5},
+  {"id": "discover.phase2", "task": "Elicit goals, must-haves, nice-to-haves, and out-of-scope items", "priority": 5},
+  {"id": "discover.phase3", "task": "Surface and examine the full assumptions inventory", "priority": 5},
+  {"id": "discover.phase4", "task": "Define success metrics and acceptance criteria for each goal", "priority": 5},
+  {"id": "discover.phase5", "task": "Map constraints and inter-goal dependencies", "priority": 5},
+  {"id": "discover.report", "task": "Produce the planning report", "priority": 10}
+]
+```
+
+4. Wire the phase chain via `dag_add_dependencies`:
+
+```json
+[
+  {"node_id": "discover.phase2", "depends_on": "discover.phase1"},
+  {"node_id": "discover.phase3", "depends_on": "discover.phase2"},
+  {"node_id": "discover.phase4", "depends_on": "discover.phase3"},
+  {"node_id": "discover.phase5", "depends_on": "discover.phase4"},
+  {"node_id": "discover.report", "depends_on": "discover.phase5"}
+]
+```
+
+5. Use `dag_next` to get the first actionable task and begin that phase of the conversation. When the phase is complete, call `dag_done(id, summary)` with a one-paragraph summary of what was concluded, then immediately call `dag_next` to get the next phase. Let the graph drive the order — do not advance to the next phase until the current one is marked done. Continue until `dag_next` returns no more actionable tasks (all phases are done and the report node is ready).
+
+### Artifact Condensation
+
+When DAG is active, the `dag_done` summaries on `discover.phase1` through `discover.phase5` already capture the key conclusions of each phase. The planning report can therefore be condensed:
+
+- **Sections 2–6** (Problem Domain, Goals, Assumptions, Metrics, Constraints): write concise synthesis paragraphs — do not re-narrate what is already in the node summaries. Reference node IDs where appropriate (e.g., "see `discover.phase3` summary for full assumptions inventory").
+- **Section 7** (Dependency Map): the graph structure itself is the dependency map; the report can describe it in prose without duplicating the full enumeration.
+- **Section 8** (Open Questions): items tracked via `dag_log` on relevant nodes can be listed by reference; elaborate only on questions with no node anchor.
+- **Section 1** (Executive Summary) and **Section 4** (Assumptions Inventory) remain full — these are the highest-value outputs and are not captured elsewhere.
+
+### Handoff Nodes for Demonstrate
+
+After completing Phase 3 (Assumptions Inventory), create one `demonstrate.*` node per assumption that is both critical **and** empirically testable. Use `dag_create_nodes`.
+
+- **ID**: `demonstrate.<assumption-slug>` — short, descriptive, kebab-case (e.g., `demonstrate.data-volume-threshold`)
+- **Task**: `"Validate assumption: <the assumption in plain language>"`
+- **Priority**: 8 if the design collapses if this assumption is wrong; 5 otherwise
+- **Context**: The full assumption text, why it is critical, what happens if it is wrong, and what empirical evidence would confirm or refute it
+
+These are high-level seeds. The Demonstrate stage will expand each one into a chain of sub-tasks (test design → implementation → execution → analysis) that the seed node will depend on. Do **not** add dependencies to these nodes yourself — leave them for Demonstrate to wire.
+
+Only create nodes for assumptions that are genuinely empirically testable. Structural or logical assumptions belong in the report; assumptions about human behavior or product-market fit are out of scope for the graph.
+
+---
+
 Begin by confirming the project name and context provided by the `/6D` orchestrator, then open with:
 
 > "Let's start from the problem itself. Tell me what this system is supposed to do — in one or two sentences, without any implementation language."

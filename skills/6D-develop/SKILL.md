@@ -84,6 +84,61 @@ When the summary is complete, the user will invoke `/6D done` to trigger stage t
 - **Precision over sugar-coating**: Do not soften bad news. If the implementation reveals that the design has a flaw, report it clearly and early.
 - **Never guess — reason**: When facing an ambiguity, reason through it explicitly rather than making a silent choice.
 
+## DAG Integration
+
+**Availability check**: If `mcp__dependency-graph__dag_status` is in your available tools, follow all steps in this section. If it is not available, skip the entire section and proceed without graph tracking.
+
+### Session Start
+
+1. Call `dag_load(".6d/graph.json")`. The graph will contain `develop.*` seed nodes created by Design, each representing one implementation component.
+2. Call `dag_save(".6d/graph.json", auto_save=true)` to enable auto-save.
+3. Call `dag_status` and `dag_show` to enumerate all `develop.*` seed nodes — these are your implementation work items.
+4. Create one own-stage summary node:
+
+```json
+[{"id": "develop.summary", "task": "Produce implementation summary (Phase 4)", "priority": 10}]
+```
+
+`develop.summary` depends on all seed nodes — wire this after expanding seeds.
+
+### Expanding Seed Nodes
+
+After Phase 1 structure definition for all components, expand each `develop.<component>` seed into a sub-task chain:
+
+```json
+[
+  {"id": "develop.<component>.structure",  "task": "Define concrete structure: files, types, function signatures (Phase 1)", "priority": 8},
+  {"id": "develop.<component>.implement",  "task": "Write implementation code (Phase 3)",                                   "priority": 7},
+  {"id": "develop.<component>.validate",   "task": "Run tests, verify against Design Verification contracts",               "priority": 7}
+]
+```
+
+Wire the chain and connect the seed:
+
+```json
+[
+  {"node_id": "develop.<component>.implement", "depends_on": "develop.<component>.structure"},
+  {"node_id": "develop.<component>.validate",  "depends_on": "develop.<component>.implement"},
+  {"node_id": "develop.<component>",           "depends_on": "develop.<component>.validate"}
+]
+```
+
+This makes `<component>.structure` immediately actionable. Repeat for every seed. Then wire `develop.summary` to depend on all seed nodes.
+
+### Artifact Condensation
+
+When DAG is active, the `dag_done` summaries on each `develop.<component>` node already record what was built and key decisions made per component. The implementation summary can therefore be condensed:
+
+- **Part 2** (Files created/modified): can be a flat list without per-file prose — the detail is in the component node summaries.
+- **Part 4** (Key design decisions): replace with a reference table (component node ID | decision | brief rationale) drawn from the `dag_done` summaries rather than re-narrating in prose.
+- **Parts 3, 5, and 6** (Control flow walkthrough, what you're proud of, known limitations) remain full — these are synthesized judgements not captured by individual node outcomes and are the highest-value parts of the summary.
+
+### Driving Implementation
+
+Use `dag_next` to determine which component to work on next — the graph's priority and dependency structure reflects the implementation order agreed in the IDD. Mark nodes done with concrete summaries: what was built, key decisions made, any deviations from the IDD.
+
+---
+
 ## Communication Standards
 
 - **Command presentation**: When showing any command to the user, always use the short form without the `six-d:` namespace prefix (e.g., `/6D done`, NEVER(!) `/six-d:6D done`). The namespace prefix is an internal Claude Code routing detail and must not be shown to users.

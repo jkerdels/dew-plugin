@@ -146,6 +146,50 @@ Before finalizing documentation output, verify:
 
 ---
 
+## DAG Integration
+
+**Availability check**: If `mcp__dependency-graph__dag_status` is in your available tools, follow all steps in this section. If it is not available, skip the entire section and proceed without graph tracking.
+
+### Session Start
+
+1. Call `dag_load(".6d/graph.json")`. The graph holds the full project history — you can use it to understand what was built and how decisions were made.
+2. Call `dag_save(".6d/graph.json", auto_save=true)` to enable auto-save.
+3. Create own-stage nodes via `dag_create_nodes`:
+
+```json
+[
+  {"id": "document.audit",                  "task": "Audit existing docs vs. artifacts; scope the diff; agree plan with user", "priority": 10},
+  {"id": "document.config",                 "task": "Generate Hugo config.toml",                                               "priority": 5},
+  {"id": "document.purpose",                "task": "Write purpose/ section",                                                  "priority": 7},
+  {"id": "document.arch-overview",          "task": "Write architecture/_index.md",                                            "priority": 7},
+  {"id": "document.arch-components",        "task": "Write architecture/components.md",                                        "priority": 6},
+  {"id": "document.arch-data-flow",         "task": "Write architecture/data-flow.md",                                        "priority": 6},
+  {"id": "document.arch-decisions",         "task": "Write architecture/decisions.md",                                        "priority": 6},
+  {"id": "document.internals-algorithms",   "task": "Write internals/algorithms.md",                                          "priority": 5},
+  {"id": "document.internals-data-structs", "task": "Write internals/data-structures.md",                                     "priority": 5},
+  {"id": "document.design-philosophy",      "task": "Write design-philosophy/_index.md",                                      "priority": 5},
+  {"id": "document.boundaries",             "task": "Write boundaries/_index.md",                                             "priority": 5},
+  {"id": "document.codebase-map",           "task": "Write codebase-map/_index.md",                                           "priority": 5},
+  {"id": "document.changelog",              "task": "Write changelog entry",                                                   "priority": 4}
+]
+```
+
+4. Wire dependencies via `dag_add_dependencies`: all content nodes depend on `document.audit`; `document.arch-components`, `document.arch-data-flow`, and `document.arch-decisions` also depend on `document.arch-overview`. `document.config` is independent.
+
+5. Use `dag_next` to drive section writing. Mark each section done when written and reviewed with the user.
+
+### Artifact Condensation
+
+When DAG is active, the full project graph is a rich source of structured information that reduces the research burden for documentation:
+
+- **architecture/decisions.md** (ADR format): the `dag_done` summaries on `design.phase3` through `design.phase6` already contain the decision context, alternatives considered, and rationale. Extract from there rather than reconstructing from memory.
+- **boundaries/** and **internals/algorithms.md**: the `demonstrate.*` node summaries (PASS/FAIL results and design implications) are direct evidence for failure modes and algorithm constraints. Draw from them explicitly.
+- **codebase-map/**: the `develop.*` node structure reflects the agreed component decomposition — use it as the skeleton for the directory tour.
+
+The documentation itself is not condensed — it must be complete and readable for external developers who do not have access to the graph. The graph reduces the effort of *producing* it, not the quality of the output.
+
+---
+
 ## Communication Standards
 
 - If artifacts are ambiguous or contradictory, report the conflict before deciding how to resolve it
