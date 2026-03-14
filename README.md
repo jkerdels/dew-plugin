@@ -2,11 +2,12 @@
 
 **dew** (formally known as 6D, new name thanks to [github.com/policecar](https://github.com/policecar) ) is a Claude Code plugin implementing a rigorous, six-stage software development process. Each stage is an interactive conversation with a specialized AI assistant, producing a concrete artifact that feeds the next stage. The workflow enforces engineering discipline: explicit assumptions, measurable goals, empirical validation before implementation, and structured retrospectives.
 
-dew offers two workflows depending on task size:
+dew offers three workflows depending on task size and desired autonomy:
 
 ```
 Full:  Discover → Design → Demonstrate → Develop → Document → Debrief
 Fast:  Plan → Build → Verify
+Auto:  Agent team (Opus + Sonnet + Haiku) runs Full or Fast autonomously
 ```
 
 ---
@@ -33,6 +34,35 @@ The fast workflow is suited for well-scoped tasks where requirements and approac
 | 1 | **Plan** | Combined problem framing and implementation design. What to build, why, and how — in one flowing conversation. Surfaces key assumptions and defines concrete acceptance tests. | `.dew/docs/fast-plan.md` |
 | 2 | **Build** | Implementation, with optional pre-implementation validation only if genuine blockers exist. Concrete structure defined and agreed before coding begins. | (codebase) |
 | 3 | **Verify** | Acceptance test execution, edge case probing, targeted doc updates, and a brief retrospective. | `.dew/docs/fast-debrief.md` |
+
+---
+
+## Auto Mode (Agent Teams)
+
+Auto mode creates a multi-model AI team that executes the dew workflow autonomously. After a brief interview to understand the task, three specialized agents collaborate through each stage — debating, challenging assumptions, and producing the same artifacts as the manual workflow.
+
+| Teammate | Model | Role |
+|----------|-------|------|
+| **analyst** | Opus | Deep analytical thinker. Finds implicit assumptions, edge cases, architectural trade-offs, and subtle failure modes. |
+| **builder** | Sonnet | Pragmatic implementer. Clean code, practical architecture, balanced trade-offs. Keeps designs buildable. |
+| **scout** | Haiku | Fast pattern-matcher and devil's advocate. Spots over-engineering, questions necessity, finds simpler alternatives. |
+
+### How it works
+
+1. **Interview** — The lead asks 5-10 questions to build a Project Brief (`.dew/docs/00-brief.md`).
+2. **Team creation** — Three teammates are spawned, each reading the brief and stage methodology.
+3. **Stage execution** — Teammates collaborate through each stage: one drives, others critique and refine. Artifacts are written when the team reaches consensus.
+4. **Fresh Eyes Protocol** — Any teammate can call `TIMEOUT` to bring in an independent reviewer with zero prior context.
+5. **Completion** — The lead reviews all artifacts against acceptance criteria and reports back.
+
+### Requirements
+
+Auto mode requires Claude Code's experimental agent teams feature. The skill will offer to enable it if not already set.
+
+```
+/dew auto        # Full 6-stage workflow
+/dew auto fast   # Fast 3-stage workflow
+```
 
 ---
 
@@ -70,6 +100,15 @@ All commands can be prefixed with the namespace `/dew:`, but the search in claud
 ```
 
 The orchestrator asks for a project name, type, and whether to use the **full** (6-stage) or **fast** (3-stage) workflow, then creates the state file and drops you into the first stage.
+
+### Run autonomously with an agent team
+
+```
+/dew auto
+/dew auto fast
+```
+
+Interviews you briefly, then creates a team of AI agents that execute the workflow without further input. See [Auto Mode](#auto-mode-agent-teams) above.
 
 ### Continue from where you left off
 
@@ -115,6 +154,7 @@ Restores the context snapshot and re-enters the active stage with full awareness
 /dew-document
 /dew-debrief
 /dew-fast
+/dew-auto
 ```
 
 ### Backtrack to an earlier stage
@@ -186,6 +226,7 @@ skills/
   dew-document/           — Hugo documentation site generator
   dew-debrief/            — retrospective facilitator
   dew-fast/               — fast workflow: Plan + Build + Verify in one skill
+  dew-auto/               — autonomous agent-team workflow
 README.md
 ```
 
@@ -207,6 +248,7 @@ All dew files live under `.dew/` in your project:
   graph.json                        — dependency graph (if MCP is active)
   context.md                        — pause snapshot (present only when paused)
   docs/
+    00-brief.md                     — auto mode project brief
     01-discover.md                  — full workflow
     02-design.md                    — full workflow
     06-debrief.md                   — full workflow

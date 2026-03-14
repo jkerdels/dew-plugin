@@ -13,8 +13,8 @@
         "source": "github",
         "repo": "jkerdels/dew-plugin"
       },
-      "description": "A structured engineering workflow: full six-stage (Discover → Design → Demonstrate → Develop → Document → Debrief) or fast three-stage (Plan → Build → Verify)",
-      "version": "1.3.0"
+      "description": "A structured engineering workflow: full six-stage, fast three-stage, or autonomous agent-team mode (Opus + Sonnet + Haiku)",
+      "version": "1.4.0"
     }
   ]
 }
