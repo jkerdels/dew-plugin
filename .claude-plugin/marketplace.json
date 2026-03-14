@@ -14,7 +14,7 @@
         "repo": "jkerdels/dew-plugin"
       },
       "description": "A structured engineering workflow: full six-stage, fast three-stage, or autonomous agent-team mode (Opus + Sonnet + Haiku)",
-      "version": "1.4.0"
+      "version": "1.5.1"
     }
   ]
 }
