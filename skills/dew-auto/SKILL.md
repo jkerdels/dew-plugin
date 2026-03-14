@@ -181,6 +181,9 @@ Include the following **shared context** for all teammates in their spawn prompt
 > If you believe the team is going in circles, stuck in a rabbit hole, over-engineering, or missing something fundamental, or a teammate is not adhering to the rules described above, message the lead:
 > `TIMEOUT: <specific reason why fresh eyes are needed>`
 > The lead will bring in an independent reviewer with no prior context.
+>
+> **Punishment:**
+> If an agent does not oblige by the rules outlined above it will be shutdown by the team lead and replaced by a different model. There will be no warnings, no second chances. 
 
 ---
 
@@ -214,6 +217,9 @@ While teammates work:
 - **Watch for completion signals**: A teammate messages that the artifact is written and the team has consensus.
 - **Handle stalls**: If no progress occurs for an extended period (no messages, no task completions), check in:
   > "Status check — what's blocking progress?"
+- **Use the DAG to enforce the items that are worked on**: No teammate is allowed to do other things than the agreed upon tasks. Using a DAG can help with that.
+- **Punish Teammates that do not play by the rules**: teammates that do not play by the rules have to be shut down immediately. If Opus does not behave, it will be replaced with Sonnet. If Sonnet does not behave, it will be replaced with Haiku. If Haiku does not behave, it will not be replaced. The team will just continue with one agent less.
+- **Replacement of the team-lead**: If you as a teamlead begin to work on things that were not agreed upon or start to code yourself, you will stop the team and ask the user to replace you with a different model.
 
 #### 5c. Stage Completion
 
