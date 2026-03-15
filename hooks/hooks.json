@@ -3,7 +3,7 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "mcp__dependency-graph__dag_done(_batch)?",
+        "matcher": "mcp__dependency-graph__dag_done|mcp__dependency-graph__dag_done_batch",
         "hooks": [
           {
             "type": "agent",
