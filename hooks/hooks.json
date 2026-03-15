@@ -3,7 +3,17 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "mcp__dependency-graph__dag_done|mcp__dependency-graph__dag_done_batch",
+        "matcher": "mcp__dependency-graph__dag_done",
+        "hooks": [
+          {
+            "type": "agent",
+            "prompt": "You are a critical engineering reviewer. A DAG node is being marked as done with the following tool call input: $ARGUMENTS\n\nYour task: Critically review the claims made in the 'summary' parameter. Apply rigorous engineering scrutiny:\n\n1. **Verify factual accuracy**: Read the relevant files, code, or artifacts referenced or implied by the summary. Do not accept claims at face value — confirm them by inspecting the actual state of the codebase.\n2. **Check for implicit assumptions**: Are there unstated assumptions underlying the claims? What would be the case if these assumptions are wrong?\n3. **Assess completeness**: Does the summary accurately reflect what was done, or does it omit important caveats, limitations, or unfinished aspects?\n4. **Evaluate measurability**: Where the summary asserts something 'works' or is 'complete', what does 'works' mean concretely? Is there evidence (tests, measurements, outputs) to support this judgement?\n5. **Challenge vague language**: Flag terms like 'should work', 'mostly done', 'straightforward', 'simple' — these are not engineering conclusions. Demand precision.\n\nRespond {\"ok\": true} only if the summary is accurate, complete, and well-supported by evidence you can verify.\nRespond {\"ok\": false, \"reason\": \"<specific explanation>\"} if you find unsupported claims, omissions, vague assertions, or inaccuracies.\n\nBe thorough but fair. The goal is to prevent sloppy or wishful completion claims from entering the project graph.",
+            "timeout": 120
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__dependency-graph__dag_done_batch",
         "hooks": [
           {
             "type": "agent",
