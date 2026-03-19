@@ -269,6 +269,8 @@ When complete, the user invokes `/dew done` to finalize the cycle.
 
 ### At Phase Start
 
+Read `skills/dew-deepcall/SKILL.md` at the start of Phase 2 (Build) — you are the **callstack executor** for that phase. Before loading the DAG at Build start, clear any stale callstack state: call `dag_next_batch`, filter for nodes whose ID starts with `callstack.`, and mark each pending one done with summary `"stale: cleared at stage start"`. Also delete any `.dew/callstack/result-*.md` files.
+
 1. Call `dag_load(".dew/graph.json")` and `dag_save(".dew/graph.json", auto_save=true)`.
 2. Create lightweight nodes for the current phase only — do not pre-create nodes for future phases.
 
@@ -294,21 +296,34 @@ Wire: each node depends on the previous.
 
 **Driving the Build with the Context Creator Agent (CCA)**
 
-After `fast.build.structure` is done and the user has confirmed the structure (Step 3), drive `fast.build.implement` through the Context Creator Agent rather than implementing directly:
+After `fast.build.structure` is done and the user has confirmed the structure (Step 3), drive `fast.build.implement` through the Context Creator Agent and the deepcall executor loop rather than implementing directly.
 
-1. Once `fast.build.implement` is actionable, spawn a fresh CCA subagent:
+Note: `fast-plan.md` serves as the quality context document for the fast workflow. Create `.dew/metacog/` if it does not exist.
+
+**Spawn-and-drain procedure** (repeat until `dag_next` returns nothing actionable for `fast.build.*` nodes):
+
+1. Call `dag_next` to get the next actionable node. Skip any node whose ID starts with `callstack.`. Note the work node ID.
+2. Spawn a fresh CCA:
    ```
    Agent(
-     description="CCA for fast.build.implement",
-     prompt="Read skills/dew-metacog/SKILL.md (your full instructions). Node ID: fast.build.implement. DAG path: .dew/graph.json. Quality context: .dew/docs/fast-plan.md. CCA log: .dew/metacog/cca-log.md.",
+     description="CCA for [node-id]",
+     prompt="Read skills/dew-metacog/SKILL.md (your full instructions). Node ID: [node-id]. DAG path: .dew/graph.json. Quality context: .dew/docs/fast-plan.md. CCA log: .dew/metacog/cca-log.md.",
      subagent_type="general-purpose"
    )
    ```
-   Note: `fast-plan.md` serves as the quality context document for the fast workflow. Create `.dew/metacog/` if it does not exist.
-2. Wait for the CCA to complete. The CCA may decompose `fast.build.implement` into sub-nodes if the implementation scope is too broad — this is expected and correct.
-3. Call `dag_status` to see what changed.
-4. If the CCA decomposed the node, continue calling `dag_next` and spawning CCA subagents until no actionable nodes remain.
-5. Proceed to `fast.build.summary` (Step 5) once all implementation nodes are done.
+3. **Drain the callstack** (run after every `Agent()` return, including those inside the drain loop itself):
+   ```
+   while True:
+     batch = dag_next_batch()
+     pending = [n for n in batch if n.id starts with "callstack."]
+     if none: break
+     node = pending[0]
+     prompt = dag_show(node.id).context
+     Agent(prompt)
+     dag_done(node.id, "executed")
+   ```
+4. Call `dag_status` to see what changed.
+5. Return to step 1. Proceed to `fast.build.summary` (Step 5) once all implementation nodes are done.
 
 **If the CCA escalated**: surface the escalation to the user before proceeding.
 

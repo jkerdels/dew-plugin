@@ -90,6 +90,8 @@ When the summary is complete, the user will invoke `/dew done` to trigger stage 
 
 ### Session Start
 
+Read `skills/dew-deepcall/SKILL.md` — you are the **callstack executor** for this stage. Before loading the DAG, clear any stale callstack state from a previous session: call `dag_next_batch`, filter for nodes whose ID starts with `callstack.`, and mark each pending one done with summary `"stale: cleared at stage start"`. Also delete any `.dew/callstack/result-*.md` files.
+
 1. Call `dag_load(".dew/graph.json")`. The graph will contain `develop.*` seed nodes created by Design, each representing one implementation component.
 2. Call `dag_save(".dew/graph.json", auto_save=true)` to enable auto-save.
 3. Call `dag_status` and `dag_show` to enumerate all `develop.*` seed nodes — these are your implementation work items.
@@ -135,10 +137,12 @@ When DAG is active, the `dag_done` summaries on each `develop.<component>` node 
 
 ### Driving Implementation with the Context Creator Agent (CCA)
 
-After seed expansion is complete, do not implement components directly. Drive implementation through the Context Creator Agent — a fresh subagent spawned per node that crafts focused worker prompts, reviews results, and manages decomposition or predecessor correction as needed.
+After seed expansion is complete, do not implement components directly. Drive implementation through the Context Creator Agent and the deepcall executor loop.
 
-1. Call `dag_next` to get the next actionable sub-task. Note the node ID.
-2. Spawn a fresh CCA subagent via the Agent tool:
+**Spawn-and-drain procedure** (repeat until `dag_next` returns nothing actionable):
+
+1. Call `dag_next` to get the next actionable sub-task. Skip any node whose ID starts with `callstack.` — those are handled by the drain loop below. Note the work node ID.
+2. Spawn a fresh CCA:
    ```
    Agent(
      description="CCA for [node-id]",
@@ -146,9 +150,19 @@ After seed expansion is complete, do not implement components directly. Drive im
      subagent_type="general-purpose"
    )
    ```
-3. Wait for the CCA subagent to complete.
+3. **Drain the callstack** (run after every `Agent()` return, including those inside the drain loop itself):
+   ```
+   while True:
+     batch = dag_next_batch()
+     pending = [n for n in batch if n.id starts with "callstack."]
+     if none: break
+     node = pending[0]
+     prompt = dag_show(node.id).context
+     Agent(prompt)
+     dag_done(node.id, "executed")
+   ```
 4. Call `dag_status` to see what changed — nodes may have been completed, decomposed, or predecessors reopened.
-5. Return to step 1. Continue until `dag_next` returns nothing actionable.
+5. Return to step 1.
 
 When all seed nodes and their sub-tasks are done, proceed to the implementation summary (Phase 4).
 

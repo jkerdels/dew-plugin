@@ -127,13 +127,19 @@ Records the reason in the state file and reloads that stage's context.
 
 ---
 
-## Optional: Dependency Graph MCP
+## Dependency Graph MCP (Required)
 
-dew natively integrates with [dependency-graph-mcp](https://github.com/jkerdels/dependency-graph-mcp) when it is available. Each stage skill checks for the MCP at startup and activates graph tracking automatically — no configuration needed.
+dew requires [dependency-graph-mcp](https://github.com/jkerdels/dependency-graph-mcp). The graph is the backbone of work tracking, agent orchestration, and the metacognitive layer — dew's Demonstrate, Develop, and Fast Build phases cannot function correctly without it.
 
-### What the graph adds
+### Installation
 
-**Work tracking per stage**: each conversation phase becomes a graph node. `dag_next` drives the order; `dag_done` records outcomes with concrete summaries. The graph enforces that phases are completed before the next begins.
+Follow the setup instructions at [dependency-graph-mcp](https://github.com/jkerdels/dependency-graph-mcp). Once the MCP server is registered in Claude Code, dew detects it automatically at stage start.
+
+The graph is persisted at `.dew/graph.json` in your project repository and committed alongside other artifacts at each stage transition and pause.
+
+### What the graph does
+
+**Work tracking per stage**: each conversation phase becomes a graph node. `dag_next` drives execution order; `dag_done` records outcomes with concrete summaries. Dependencies enforce that prerequisite phases complete before the next begins.
 
 **Cross-stage handoff nodes**: stages plant seeds in the graph for downstream stages to pick up and elaborate:
 
@@ -144,15 +150,11 @@ dew natively integrates with [dependency-graph-mcp](https://github.com/jkerdels/
 
 This gives the project a single, growing dependency graph that spans the entire development cycle — from discovery assumptions through to implementation components.
 
-**Artifact condensation**: when the graph is active, written artifacts (planning report, IDD, DVD, implementation summary, debrief) are condensed. The graph carries the reasoning trail and decision log; artifacts focus on synthesis and conclusions. Specific sections that can be shortened are called out in each stage skill.
+**Agent orchestration via deepcall**: the Demonstrate, Develop, and Fast Build phases drive implementation through the Context Creator Agent (CCA) — a fresh subagent spawned per DAG node. When the CCA needs to spawn a worker agent, it writes `callstack.*` nodes (priority 0) into the graph and terminates. The stage skill reads these nodes and runs the worker on behalf of the CCA, then re-invokes the CCA to review the result. This DAG-based call stack is how dew works around the single-level subagent constraint in Claude Code.
+
+**Artifact condensation**: when the graph is active, written artifacts are condensed. The graph carries the reasoning trail and decision log; artifacts focus on synthesis and conclusions. Specific sections that can be shortened are called out in each stage skill.
 
 **Retrospective evidence**: the Debrief stage reads the full project graph — node counts per stage, PASS/FAIL patterns on `demonstrate.*` nodes, invalidation cascades (signals rework), and planned-vs-actual component structure — as primary evidence for the retrospective.
-
-### Installation
-
-Follow the setup instructions at [dependency-graph-mcp](https://github.com/jkerdels/dependency-graph-mcp). Once the MCP server is registered in Claude Code, dew detects it automatically.
-
-The graph is persisted at `.dew/graph.json` in your project repository and committed alongside other artifacts at each stage transition and pause.
 
 ---
 
@@ -186,6 +188,8 @@ skills/
   dew-document/           — Hugo documentation site generator
   dew-debrief/            — retrospective facilitator
   dew-fast/               — fast workflow: Plan + Build + Verify in one skill
+  dew-metacog/            — Context Creator Agent (CCA): per-node subagent orchestrator
+  dew-deepcall/           — DAG-based call stack protocol for recursive agent spawning
 README.md
 ```
 
@@ -204,7 +208,7 @@ All dew files live under `.dew/` in your project:
 ```
 .dew/
   state.md                          — workflow state (full or fast)
-  graph.json                        — dependency graph (if MCP is active)
+  graph.json                        — dependency graph (required)
   context.md                        — pause snapshot (present only when paused)
   docs/
     01-discover.md                  — full workflow
@@ -215,6 +219,11 @@ All dew files live under `.dew/` in your project:
   design-verification/
     DESIGN_VERIFICATION.md
     <test programs>
+  metacog/
+    quality-requirements.md         — global quality context written at end of Design stage
+    cca-log.md                      — CCA metacognitive log (created at runtime)
+  callstack/
+    result-<node-id>.md             — ephemeral worker result files (cleared on pause/stage start)
 ```
 
 Every state transition is committed to git, giving you a full audit trail of the development cycle.
