@@ -142,7 +142,8 @@ After seed expansion is complete, do not implement components directly. Drive im
 **Spawn-and-drain procedure** (repeat until `dag_next` returns nothing actionable):
 
 1. Call `dag_next` to get the next actionable sub-task. Skip any node whose ID starts with `callstack.` — those are handled by the drain loop below. Note the work node ID.
-2. Spawn a fresh CCA:
+2. Read the node's context field (via `dag_show(node-id)`) and identify any IDD section references (e.g., "IDD §5", "IDD §6.2"). Read those sections from `.dew/docs/02-design.md` and include the **quoted text** in the CCA prompt — the implementing agent needs the actual specification, not just a pointer.
+3. Spawn a fresh CCA:
    ```
    Agent(
      description="CCA for [node-id]",
@@ -150,7 +151,7 @@ After seed expansion is complete, do not implement components directly. Drive im
      subagent_type="general-purpose"
    )
    ```
-3. **Drain the callstack** (run after every `Agent()` return, including those inside the drain loop itself):
+4. **Drain the callstack** (run after every `Agent()` return, including those inside the drain loop itself):
    ```
    while True:
      batch = dag_next_batch()
@@ -161,8 +162,8 @@ After seed expansion is complete, do not implement components directly. Drive im
      Agent(prompt)
      dag_done(node.id, "executed")
    ```
-4. Call `dag_status` to see what changed — nodes may have been completed, decomposed, or predecessors reopened.
-5. Return to step 1.
+5. Call `dag_status` to see what changed — nodes may have been completed, decomposed, or predecessors reopened.
+6. Return to step 1.
 
 When all seed nodes and their sub-tasks are done, proceed to the implementation summary (Phase 4).
 
