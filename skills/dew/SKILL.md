@@ -50,7 +50,7 @@ description: dew workflow orchestrator. Manages the full six-stage process (Disc
 
 ## Commit Mode
 
-!`if git rev-parse --git-dir >/dev/null 2>&1; then if git check-ignore -q .dew 2>/dev/null; then echo "COMMIT_MODE: skip — .dew is gitignored (artifacts are ephemeral)"; else echo "COMMIT_MODE: enabled — .dew artifacts will be committed at stage boundaries"; fi; else echo "COMMIT_MODE: skip — not a git repository"; fi`
+!`grep -qE '^\.dew/?$|^/\.dew/?$' .gitignore 2>/dev/null && echo "COMMIT_MODE: skip — .dew is gitignored (artifacts are ephemeral)" || git rev-parse --git-dir >/dev/null 2>&1 && echo "COMMIT_MODE: enabled — .dew artifacts will be committed at stage boundaries" || echo "COMMIT_MODE: skip — not a git repository"`
 
 ## Worktree Policy
 
